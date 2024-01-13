@@ -141,7 +141,6 @@ Hook.Add("item.applyTreatment", "appliedTreatment", function(item, usingCharacte
 	--logging items that are suspicious to use in large amounts. No immediate alarm on this, just keep an eye on it.
 	for itemName, suspicionLevel in pairs(susTable) do
 		if itemName == item.name and usingCharacter ~= nil then
-			print(usingCharacter.Name .. " has applied " .. item.name .. " to " .. targetCharacter.name .. ".")
 			increaseSusPoints(usingCharacter.Name, suspicionLevel)
 			if susPoints[usingCharacter.Name] > susThreshold then 
 				isSuspicious = true
@@ -166,7 +165,6 @@ Hook.Add("item.use", "usedItem", function(item, itemUser, targetLimb)
    --logging items that are suspicious to use in large amounts. No immediate alarm on this, just keep an eye on it.
 	for itemName, suspicionLevel in pairs(susTable) do
 		if itemName == item.name and itemUser ~= nil then
-			print(itemUser.Name .. " has used " .. item.name .. ".")
 			increaseSusPoints(itemUser.Name, suspicionLevel)
 			if susPoints[itemUser.Name] > susThreshold then 
 				isSuspicious = true
@@ -257,6 +255,13 @@ Hook.Add("chatMessage", "wiringRecieve", function (message, client)
 
 	--check if someone is messing with wiring
 	if string.find(message, "wire") then
+		print(message)
+		local myPos = Character.Controlled
+		sound.Play(10, 100000, myPos)
+	end
+	
+	--check if someone is messing with the drone
+	if string.find(message, "undocked") then
 		print(message)
 		local myPos = Character.Controlled
 		sound.Play(10, 100000, myPos)

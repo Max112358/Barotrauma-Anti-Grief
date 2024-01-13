@@ -10,6 +10,8 @@ Hook.Add("serverLog", "checkForTrolling", function (text, serverLogMessageType)
 	if serverLogMessageType == 1 then
 		for key, client in pairs(Client.ClientList) do
 			if client.HasPermission(ClientPermissions.Ban)then
+			
+				--detect putting the reactor into a dangerous state
 				local pattern = "Fission rate: ([8-9]%d)"
 				local pattern2 = "Fission rate: 100"
 				local pattern3 = "Turbine output: ([0-1]?%d),"
@@ -18,6 +20,15 @@ Hook.Add("serverLog", "checkForTrolling", function (text, serverLogMessageType)
 					chatMessage.Color = Color(255, 255, 0, 255)
 					Game.SendDirectChatMessage(chatMessage, client)
 				end
+				
+				--detect undocking the drone or ship
+				local undockPattern = "undocked"
+				if string.find(text, undockPattern) then
+					local chatMessage = ChatMessage.Create("Griefing Detection", text, ChatMessageType.Default, nil, nil)
+					chatMessage.Color = Color(255, 255, 0, 255)
+					Game.SendDirectChatMessage(chatMessage, client)
+				end
+				
 			end
 		end
 	end
