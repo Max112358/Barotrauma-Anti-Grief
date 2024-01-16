@@ -1,12 +1,12 @@
+--this is a global so that all dependant classes can get it from here. Must be above the client filter!
+messageFilters = {"wire", "undocked", "Fission"}
 
 if CLIENT then return end -- stops this from running on the client
 
 
-
-
 Hook.Add("serverLog", "checkForTrolling", function (text, serverLogMessageType)
 
-	--1 is is the message type for item interaction, which includes the reactor
+	--1 is is the message type for item interaction, which includes the reactor and drone
 	if serverLogMessageType == 1 then
 		for key, client in pairs(Client.ClientList) do
 			if client.HasPermission(ClientPermissions.Ban)then
