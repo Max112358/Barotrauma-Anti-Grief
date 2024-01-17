@@ -33,7 +33,6 @@ Hook.Add("serverLog", "checkForTrolling", function (text, serverLogMessageType)
 		end
 	end
 
-
 	--5 is is the message type for wiring
 	if serverLogMessageType == 5 then
 		for key, client in pairs(Client.ClientList) do
@@ -44,6 +43,6 @@ Hook.Add("serverLog", "checkForTrolling", function (text, serverLogMessageType)
 			end
 		end
 	end
-
+	
 end)
 

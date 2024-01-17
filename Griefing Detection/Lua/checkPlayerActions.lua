@@ -11,7 +11,7 @@ local sound = Game.SoundManager.LoadSound(path .. "/alert.ogg")
 local configPath = path .. "/config.json"
 
 -- Function to update player scores
-function increaseSusPoints(playerName, amountToIncrease)
+local function increaseSusPoints(playerName, amountToIncrease)
     -- Check if the player is already in the table
     if susPoints[playerName] then
         -- Player is already in the table, increment their score
@@ -23,7 +23,7 @@ function increaseSusPoints(playerName, amountToIncrease)
 end
 
 -- Function to reduce points for all players
-function reducePointsForAll()
+local function reducePointsForAll()
 
     for playerName, score in pairs(susPoints) do
         -- Decrement the score by 1
@@ -39,13 +39,22 @@ end
 reducePointsForAll()
 
 
-
-
 -- Function to activate the alarm
-function activateAlarm(printStatement)
+local function activateAlarm(printStatement)
 	print(printStatement)
 	local myPos = Character.Controlled --center on the controlled character
 	sound.Play(10, 100000, myPos)
+end
+
+-- Function to find the AccountId id from a given character
+local function getClientID(passedCharacter)
+	local clientID = ""
+	for key, client in pairs(Client.ClientList) do
+		if client.Character == passedCharacter then
+			clientID = client.AccountId
+		end
+	end
+	return clientID
 end
 
 
@@ -77,10 +86,9 @@ Hook.Add("item.equip", "equippedAnItem", function(item, paramCharacter)
 		end
 	end
 
-   if isSuspicious then activateAlarm(paramCharacter.name .. " has equipped " .. item.name .. "!!!!") end
+	local clientID = getClientID(paramCharacter)
+	if isSuspicious then activateAlarm(paramCharacter.name .. " has equipped " .. item.name .. "!!!!" .. " Client ID: " .. tostring(clientID)) end
 end)
-
-
 
 --applied an item
 Hook.Add("item.applyTreatment", "appliedTreatment", function(item, usingCharacter, targetCharacter, limb)
@@ -110,8 +118,8 @@ Hook.Add("item.applyTreatment", "appliedTreatment", function(item, usingCharacte
 		end
 	end
    
-   
-   	if isSuspicious then activateAlarm(usingCharacter.name .. " has applied " .. item.Name .. " to " .. targetCharacter.name .. "!!!!") end
+	local clientID = getClientID(usingCharacter)
+	if isSuspicious then activateAlarm(usingCharacter.name .. " has applied " .. item.Name .. " to " .. targetCharacter.name .. "!!!!" .. " Client ID: " .. tostring(clientID)) end
 
    
 end)
@@ -142,7 +150,8 @@ Hook.Add("item.use", "usedItem", function(item, itemUser, targetLimb)
 		end
 	end
    
-	if isSuspicious then activateAlarm(itemUser.name .. " has used " .. item.Name .. "!!!!") end
+	local clientID = getClientID(itemUser)
+	if isSuspicious then activateAlarm(itemUser.name .. " has used " .. item.Name .. "!!!!"  .. " Client ID: " .. tostring(clientID)) end
    
 end)
 
@@ -190,7 +199,7 @@ Hook.Add("inventoryPutItem", "transferredAnItem", function(inventory, item, char
 	
 	--logging items that are suspicious to use in large amounts. No immediate alarm on this, just keep an eye on it.
 	for itemName, suspicionLevel in pairs(config.susTable) do
-		if itemName == item.Name and characterUser ~= nil then
+		if itemName == item.Prefab.Identifier and characterUser ~= nil then
 			print(characterUser.Name .. " has transferred " .. item.name .. " to " .. inventory.owner.name .. ".")
 			
 			if suspicionLevel > config.susThreshold then
@@ -206,57 +215,6 @@ Hook.Add("inventoryPutItem", "transferredAnItem", function(inventory, item, char
 		end
 	end
 
-   
-	if isSuspicious then activateAlarm(characterUser.Name .. " has transferred " .. item.name .. " to " .. inventory.owner.name .. "!!!!") end
- 
-   
-end)
-
-function retrieveName(inputString)
-    local strippedString = inputString:gsub("[^%w%s]", "")
-	local leftSide = string.match(strippedString, "(.-)" .. "end " .. "(.+)")
-	local nextStep = string.match(leftSide, "%d(.+)")
-	local finalized = leftSide:gsub("%d", "")
-    return finalized
-end
-
-
---this works with the server side script to detect wiring changes. this will not work if the mod isnt running on the server.
-Hook.Add("chatMessage", "serverChatRecieve", function (message, client)
-	if Character.Controlled ~= nil then return end --do nothing if its not from the server
-	
-	local foundIt = false
-	for _, filter in ipairs(messageFilters) do
-		if string.find(message, filter) then 
-			foundIt = true
-		end
-	end
-	if foundIt == false then return true end
-	
-	
-	config = json.parse(File.Read(configPath)) -- I have no idea why this is needed. Somehow its not recognizing changes to the global config without it. Reference error somehow?
-	
-	local strippedName = retrieveName(message);
-	
-	
-	local isYou = false
-	if Character.Controlled ~= nil then
-		local isYou = (string.find(strippedName, Character.Controlled.name))
-	end
-	if (isYou and not config.selfAlarmEnabled) then return true end --if its your character and self alarm not active, abort
-
-	
-	if (string.find(message, "wire")) and config.wiringAlarmEnabled then
-		activateAlarm(message)
-	end
-	
-	if (string.find(message, "undocked")) and config.undockAlarmEnabled then
-		activateAlarm(message)
-	end
-	
-	if (string.find(message, "Fission")) and config.reactorAlarmEnabled then
-		activateAlarm(message)
-	end
-	
-    return true -- returning true allows us to hide the message
+	local clientID = getClientID(characterUser)
+	if isSuspicious then activateAlarm(characterUser.Name .. " has transferred " .. item.name .. " to " .. inventory.owner.name .. "!!!!" .. " Client ID: " .. tostring(clientID)) end
 end)

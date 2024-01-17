@@ -31,10 +31,11 @@ config.susTable = { --how suspicious using a given item is
     ["rum"] = 11,
     ["ethanol"] = 8,
     ["calyxanide"] = 11,
+	["flashpowder"] = 11,
+	
 	
 	--ultra sus items beyond this point
 	["deliriumine"] = 25,
-	["huskeggsbasic"] = 25, --actual eggs
 	["huskeggs"] = 25,      --calyx extract
 	["cyanide"] = 25,
 	["radiotoxin"] = 25,
@@ -49,7 +50,9 @@ config.susTable = { --how suspicious using a given item is
 	["stungrenade"] = 25,
 	["empgrenade"] = 25,
 	["oxygeniteshard"] = 25,
-	["nuclearshell"] = 25
+	["nuclearshell"] = 25,
+	["volatilecompoundn"] = 25,
+	["molotovcoctail"] = 25
 }
 
 

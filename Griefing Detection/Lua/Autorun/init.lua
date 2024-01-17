@@ -18,6 +18,9 @@ end
 File.Write(configPath, json.serialize(config))
 
 --run the rest of the files
-dofile(path .. "/Lua/serverSide.lua")
-dofile(path .. "/Lua/clientSide.lua")
+dofile(path .. "/Lua/monitorServerLog.lua")
+dofile(path .. "/Lua/checkPlayerActions.lua")
 dofile(path .. "/Lua/commands.lua")
+dofile(path .. "/Lua/checkBanList.lua")
+dofile(path .. "/Lua/recieveServerMessages.lua")
+dofile(path .. "/Lua/transferBans.lua")
