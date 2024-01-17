@@ -1,8 +1,13 @@
 if CLIENT then return end --prevents it from running on the client
 
+
+--the purpose of this script is to transfer bans from your local storage inside the mod to actual ingame bans
+--it records and players you want to ban via the commands, EX gd ban name reason
+--upon hosting a server you control, the local list gets turned into actual bans then is erased
+
+
+
 local personalBanListPath = path .. "/bannedplayers.txt"
-
-
 
 -- Function to reduce points for all players
 local function transfer()

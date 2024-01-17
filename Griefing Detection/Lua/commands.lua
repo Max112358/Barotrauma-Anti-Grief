@@ -1,3 +1,8 @@
+if SERVER then return end --prevents it from running on the server
+
+--the purpose of this script is to provide a set of commands available to the player
+--it lets them switch options on or off or change various thresholds or speeds
+
 
 local configDescriptions = {}
 configDescriptions["commands"] = "you can use grief, greif, gd or griefingdetector"

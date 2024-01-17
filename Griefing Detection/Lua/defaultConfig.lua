@@ -1,4 +1,7 @@
 
+--the purpose of this script is to provide a baseline set of values for the in game options
+--the player can type gd reset to set all options to these values
+
 local config = {}
 
 config.susThreshold = 20 --tolerance for how suspicious someone can act before alarms go off

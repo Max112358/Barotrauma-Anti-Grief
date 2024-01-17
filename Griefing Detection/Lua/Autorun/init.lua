@@ -1,4 +1,10 @@
 
+
+--the purpose of this script is to initalize the mod
+--it reads any changes from the default config and saves the result as a global varible
+--after that it loads the rest of the scripts
+
+
 --get the local path and save it as a global. only autorun files can get the path in this way!
 path = ...
 

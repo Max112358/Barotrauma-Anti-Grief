@@ -6,4 +6,4 @@ Each item has a suspicion level, and that level gets added to each players total
 The suspicion level for players naturally falls over time. As long as players dont do too much suspicious stuff too fast they should be fine.
 Its basically a warning that the host needs to check the logs because he might be getting griefed. 
 
-It also has detectors for someone putting the reactor into a bad state, or rewiring things. These two require this mod to be running on the server. Everything else will run even in someone elses game.
+It also has detectors for someone putting the reactor into a bad state, or rewiring things, or undocking a drone. These require this mod to be running on the server. Everything else will run even in someone elses game.

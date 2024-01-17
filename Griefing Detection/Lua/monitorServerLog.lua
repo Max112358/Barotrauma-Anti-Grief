@@ -3,6 +3,11 @@ messageFilters = {"wire", "undocked", "Fission"}
 
 if CLIENT then return end -- stops this from running on the client
 
+--the purpose of this class is to allow printing from the serverLog Hook
+--normally you cannot print using this, but by sending it to players as a chat message,
+--you can print things to console that way
+
+
 
 Hook.Add("serverLog", "checkForTrolling", function (text, serverLogMessageType)
 

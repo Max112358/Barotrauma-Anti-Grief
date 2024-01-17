@@ -1,7 +1,7 @@
-
 if SERVER then return end --prevents it from running on the server
---this script runs client side only. clients cannot see the serverLog, so cannot detect wiring issues or the reactor
 
+--the purpose of this script is check joining players against your local banlist and warn them if they are
+--this way you can warn the host even if its not your server
 
 
 local badGuyList = File.Read("Data/bannedplayers.xml")

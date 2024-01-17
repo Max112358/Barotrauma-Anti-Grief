@@ -1,7 +1,6 @@
---print("your local mod is running")
-
 if SERVER then return end --prevents it from running on the server
---this script runs client side only. clients cannot see the serverLog, so cannot detect wiring issues or the reactor
+
+--the purpose of this script is to check the actions of all players and sound an alarm if they seem suspicious
 
 local susPoints = {} --every time someone does something suspicious, add points. Ring alarm beyond threshold.
 
