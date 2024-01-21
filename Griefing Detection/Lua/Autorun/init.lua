@@ -6,27 +6,27 @@
 
 
 --get the local path and save it as a global. only autorun files can get the path in this way!
-path = ...
+griefingDetectionPath = ...
 
-local configPath = path .. "/config.json"
-config = dofile(path .. "/Lua/defaultConfig.lua") --config is also a global
+local configPath = griefingDetectionPath .. "/config.json"
+griefingDetectionConfig = dofile(griefingDetectionPath .. "/Lua/defaultConfig.lua") --config is also a global
 
 if File.Exists(configPath) then
 	local overrides = json.parse(File.Read(configPath))
-	for i, _ in pairs(config) do
+	for i, _ in pairs(griefingDetectionConfig) do
 		if overrides[i] ~= nil then
-			config[i] = overrides[i]
+			griefingDetectionConfig[i] = overrides[i]
 		end
 	end
 end
 
 -- write the config back to disk to ensure it lists any new options
-File.Write(configPath, json.serialize(config))
+File.Write(configPath, json.serialize(griefingDetectionConfig))
 
 --run the rest of the files
-dofile(path .. "/Lua/monitorServerLog.lua")
-dofile(path .. "/Lua/checkPlayerActions.lua")
-dofile(path .. "/Lua/commands.lua")
-dofile(path .. "/Lua/checkBanList.lua")
-dofile(path .. "/Lua/recieveServerMessages.lua")
-dofile(path .. "/Lua/transferBans.lua")
+dofile(griefingDetectionPath .. "/Lua/monitorServerLog.lua")
+dofile(griefingDetectionPath .. "/Lua/checkPlayerActions.lua")
+dofile(griefingDetectionPath .. "/Lua/commands.lua")
+dofile(griefingDetectionPath .. "/Lua/checkBanList.lua")
+dofile(griefingDetectionPath .. "/Lua/recieveServerMessages.lua")
+dofile(griefingDetectionPath .. "/Lua/transferBans.lua")

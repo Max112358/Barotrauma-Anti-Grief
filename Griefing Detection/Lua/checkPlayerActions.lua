@@ -6,9 +6,9 @@ local susPoints = {} --every time someone does something suspicious, add points.
 local clientID = ""
 
 -- Use the constructed path. path is a global stored in init
-local sound = Game.SoundManager.LoadSound(path .. "/alert.ogg")
+local sound = Game.SoundManager.LoadSound(griefingDetectionPath .. "/alert.ogg")
 
-local configPath = path .. "/config.json"
+local configPath = griefingDetectionPath .. "/config.json"
 
 -- Function to update player scores
 local function increaseSusPoints(playerName, amountToIncrease)
@@ -32,7 +32,7 @@ local function reducePointsForAll()
 		end
     end
 	
-	Timer.Wait(reducePointsForAll, config.decayTime) --recursively run again every X seconds, where X is decayTime
+	Timer.Wait(reducePointsForAll, griefingDetectionConfig.decayTime) --recursively run again every X seconds, where X is decayTime
 end
 
 -- Start the timer initially
@@ -65,7 +65,7 @@ local function hookBoilerPlate(item, paramCharacter)
 	
 	if paramCharacter == nil then return false end
 
-	config = json.parse(File.Read(configPath)) -- I have no idea why this is needed. Somehow its not recognizing changes to the global config without it. Reference error somehow?
+	griefingDetectionConfig = json.parse(File.Read(configPath)) -- I have no idea why this is needed. Somehow its not recognizing changes to the global griefingDetectionConfig without it. Reference error somehow?
    
 	local isYou = false
 	--if client ~= nil then
@@ -73,13 +73,13 @@ local function hookBoilerPlate(item, paramCharacter)
 		isYou = (Character.Controlled.name == paramCharacter.name)
 	end
 	
-	if (isYou and not config.selfAlarmEnabled) then return false end --if its your character and self alarm not active, abort
+	if (isYou and not griefingDetectionConfig.selfAlarmEnabled) then return false end --if its your character and self alarm not active, abort
    
 	--check against the sus table to see if the item is bad
-	for itemName, suspicionLevel in pairs(config.susTable) do
+	for itemName, suspicionLevel in pairs(griefingDetectionConfig.susTable) do
 		if itemName == item.Prefab.Identifier then
 			increaseSusPoints(paramCharacter.Name, suspicionLevel)
-			if susPoints[paramCharacter.Name] > config.susThreshold then 
+			if susPoints[paramCharacter.Name] > griefingDetectionConfig.susThreshold then 
 				isSuspicious = true
 			end
 			break -- Exit the loop if a match is found
@@ -126,19 +126,19 @@ Hook.Add("inventoryPutItem", "transferredAnItem", function(inventory, item, char
    
 	if characterUser == nil then return end
    
-	config = json.parse(File.Read(configPath)) -- I have no idea why this is needed. Somehow its not recognizing changes to the global config without it. Reference error somehow?
+	griefingDetectionConfig = json.parse(File.Read(configPath)) -- I have no idea why this is needed. Somehow its not recognizing changes to the global config without it. Reference error somehow?
 
-	-- Check if item.Name matches any entry in config.susTable
+	-- Check if item.Name matches any entry in griefingDetectionConfig.susTable
 	local isSuspicious = false
    
 	local isYou = false
 	if Character.Controlled ~= nil then
 		isYou = (Character.Controlled.name == characterUser.name)
 	end
-	if (isYou and not config.selfAlarmEnabled) then return end --if its your character and self alarm not active, abort
+	if (isYou and not griefingDetectionConfig.selfAlarmEnabled) then return end --if its your character and self alarm not active, abort
    
 	--if they put welding fuel in a suit or mask
-	for _, itemName in ipairs(config.breathingDevices) do
+	for _, itemName in ipairs(griefingDetectionConfig.breathingDevices) do
 	  if (item.Name == "Welding Fuel Tank" or item.Name == "Incendium Fuel Tank") and inventory.owner.name == itemName then
 		 isSuspicious = true
 		 break
@@ -149,17 +149,17 @@ Hook.Add("inventoryPutItem", "transferredAnItem", function(inventory, item, char
 	isSuspicious = (item.Name == "Oxygenite Tank" or item.Name == "Oxygen Tank") and inventory.owner.name == "Welding Tool")
 	
 	--logging items that are suspicious to use in large amounts. No immediate alarm on this, just keep an eye on it.
-	for itemName, suspicionLevel in pairs(config.susTable) do
+	for itemName, suspicionLevel in pairs(griefingDetectionConfig.susTable) do
 		if itemName == item.Prefab.Identifier and characterUser ~= nil then
 			print(characterUser.Name .. " has transferred " .. item.name .. " to " .. inventory.owner.name .. ".")
 			
-			if suspicionLevel > config.susThreshold then
+			if suspicionLevel > griefingDetectionConfig.susThreshold then
 				increaseSusPoints(characterUser.Name, suspicionLevel) --for items that are immediately suspicious
 			else
 				increaseSusPoints(characterUser.Name, 1) --for normal items like fuel rods
 			end
 			
-			if susPoints[characterUser.Name] > config.susThreshold then 
+			if susPoints[characterUser.Name] > griefingDetectionConfig.susThreshold then 
 				isSuspicious = true
 			end
 			break -- Exit the loop if a match is found

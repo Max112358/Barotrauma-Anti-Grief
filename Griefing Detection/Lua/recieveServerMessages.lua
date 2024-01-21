@@ -15,10 +15,10 @@ local function retrieveName(inputString)
     return name
 end
 
-local configPath = path .. "/config.json"
+local configPath = griefingDetectionPath .. "/config.json"
 
 -- Use the constructed path. path is a global stored in init
-local sound = Game.SoundManager.LoadSound(path .. "/alert.ogg")
+local sound = Game.SoundManager.LoadSound(griefingDetectionPath .. "/alert.ogg")
 -- Function to activate the alarm
 local function activateAlarm(printStatement)
 	print(printStatement)
@@ -32,7 +32,7 @@ Hook.Add("chatMessage", "serverChatRecieve", function (message, client)
 	if client ~= nil then return end --do nothing if its not from the server
 	
 	local containsKeyWord = false
-	for _, filter in ipairs(messageFilters) do
+	for _, filter in ipairs(griefingDetectionMessageFilters) do
 		if string.find(message, filter) then 
 			containsKeyWord = true
 		end

@@ -16,7 +16,7 @@ configDescriptions["ban"] = "Adds player to personal banlist. Use this if you ar
 
 
 local function writeConfig(newConfig)
-	File.Write(path .. "/config.json", json.serialize(newConfig))
+	File.Write(griefingDetectionPath .. "/config.json", json.serialize(newConfig))
 end
 
 
@@ -70,16 +70,16 @@ local function runCommand(command)
 	
 	if command[1] == "reset" then
 		print("Resetting to default!")
-		config = {}
-		config = dofile(path .. "/Lua/defaultConfig.lua")
-		writeConfig(dofile(path .. "/Lua/defaultConfig.lua"))
+		griefingDetectionConfig = {}
+		griefingDetectionConfig = dofile(griefingDetectionPath .. "/Lua/defaultConfig.lua")
+		writeConfig(dofile(griefingDetectionPath .. "/Lua/defaultConfig.lua"))
 	end
 	
 	if command[1] == "threshold" then
 		if isInteger(command[2]) then
 			print("Changing suspicion threhold!")
-			config.susThreshold = tonumber(command[2])
-			writeConfig(config)
+			griefingDetectionConfig.susThreshold = tonumber(command[2])
+			writeConfig(griefingDetectionConfig)
 		else
 			print("Number not supplied, changing nothing.")
 		end
@@ -88,8 +88,8 @@ local function runCommand(command)
 	if command[1] == "decaytime" then
 		if isInteger(command[2]) then
 			print("Changing decay time!")
-			config.decayTime = tonumber(command[2])
-			writeConfig(config)
+			griefingDetectionConfig.decayTime = tonumber(command[2])
+			writeConfig(griefingDetectionConfig)
 		else
 			print("Number not supplied, changing nothing.")
 		end
@@ -102,8 +102,8 @@ local function runCommand(command)
 				print("could not find item with the id/name \"", command[2], "\"")
 			else
 				print("Adding item!")
-				config.susTable[command[2]] = tonumber(command[3])
-				writeConfig(config)
+				griefingDetectionConfig.susTable[command[2]] = tonumber(command[3])
+				writeConfig(griefingDetectionConfig)
 			end
 		else
 			print("Number not supplied, changing nothing.")
@@ -112,12 +112,12 @@ local function runCommand(command)
 	
 	if command[1] == "remove" then
 	
-		if config.susTable[command[2]] ~= nil then
+		if griefingDetectionConfig.susTable[command[2]] ~= nil then
 			print("Removing item!")
-			local newTable = dofile(path .. "/Lua/defaultConfig.lua")
-			addMissingEntriesWithExclusionRecursive(config, newTable, command[2])
+			local newTable = dofile(griefingDetectionPath .. "/Lua/defaultConfig.lua")
+			addMissingEntriesWithExclusionRecursive(griefingDetectionConfig, newTable, command[2])
 			writeConfig(newTable)
-			config = newTable
+			griefingDetectionConfig = newTable
 		else
 			print("Item not found in the table.")
 		end
@@ -126,27 +126,27 @@ local function runCommand(command)
 	if command[1] == "toggle" then
 	
 		if command[2] == "self" then
-			config.selfAlarmEnabled = not config.selfAlarmEnabled
-			writeConfig(config)
-			print("Self Alarm Active: " .. tostring(config.selfAlarmEnabled))
+			griefingDetectionConfig.selfAlarmEnabled = not griefingDetectionConfig.selfAlarmEnabled
+			writeConfig(griefingDetectionConfig)
+			print("Self Alarm Active: " .. tostring(griefingDetectionConfig.selfAlarmEnabled))
 		end
 		
 		if command[2] == "reactor" then
-			config.reactorAlarmEnabled = not config.reactorAlarmEnabled
-			writeConfig(config)
-			print("Reactor Alarm Active: " .. tostring(config.reactorAlarmEnabled))
+			griefingDetectionConfig.reactorAlarmEnabled = not griefingDetectionConfig.reactorAlarmEnabled
+			writeConfig(griefingDetectionConfig)
+			print("Reactor Alarm Active: " .. tostring(griefingDetectionConfig.reactorAlarmEnabled))
 		end
 		
 		if command[2] == "undock" then
-			config.undockAlarmEnabled = not config.undockAlarmEnabled
-			writeConfig(config)
-			print("Undock Alarm Active: " .. tostring(config.undockAlarmEnabled))
+			griefingDetectionConfig.undockAlarmEnabled = not griefingDetectionConfig.undockAlarmEnabled
+			writeConfig(griefingDetectionConfig)
+			print("Undock Alarm Active: " .. tostring(griefingDetectionConfig.undockAlarmEnabled))
 		end
 		
 		if command[2] == "wiring" then
-			config.wiringAlarmEnabled = not config.wiringAlarmEnabled
-			writeConfig(config)
-			print("Wiring Alarm Active: " .. tostring(config.wiringAlarmEnabled))
+			griefingDetectionConfig.wiringAlarmEnabled = not griefingDetectionConfig.wiringAlarmEnabled
+			writeConfig(griefingDetectionConfig)
+			print("Wiring Alarm Active: " .. tostring(griefingDetectionConfig.wiringAlarmEnabled))
 		end
 		
 	end
@@ -157,7 +157,7 @@ local function runCommand(command)
 		if command[3] ~= nil then reason = command[3] end
 		if clientID ~= "" then
 			--ban the player
-			local personalBanListPath = path .. "/bannedplayers.txt"
+			local personalBanListPath = griefingDetectionPath .. "/bannedplayers.txt"
 			local newLineToAdd = '  <ban name="' .. command[2] .. '" reason="' .. reason .. '" accountid="' .. tostring(clientID) .. '" />\n'
 
 			if File.Exists(personalBanListPath) then

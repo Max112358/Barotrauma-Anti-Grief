@@ -7,7 +7,7 @@ if SERVER then return end --prevents it from running on the server
 local badGuyList = File.Read("Data/bannedplayers.xml")
 --print(badGuyList)
 
-local sound = Game.SoundManager.LoadSound(path .. "/alert.ogg")
+local sound = Game.SoundManager.LoadSound(griefingDetectionPath .. "/alert.ogg")
 
 -- Function to find the AccountId id from a given character
 local function getClientID(passedCharacter)

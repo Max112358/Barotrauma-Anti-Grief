@@ -7,7 +7,7 @@ if CLIENT then return end --prevents it from running on the client
 
 
 
-local personalBanListPath = path .. "/bannedplayers.txt"
+local personalBanListPath = griefingDetectionPath .. "/bannedplayers.txt"
 
 -- Function to reduce points for all players
 local function transfer()

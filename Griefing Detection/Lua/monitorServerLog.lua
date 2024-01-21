@@ -1,5 +1,5 @@
 --this is a global so that all dependant classes can get it from here. Must be above the client filter!
-messageFilters = {"wire", "undocked", "Fission"}
+griefingDetectionMessageFilters = {"wire", "undocked", "Fission"}
 
 if CLIENT then return end -- stops this from running on the client
 
