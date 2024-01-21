@@ -7,8 +7,6 @@ if CLIENT then return end -- stops this from running on the client
 --normally you cannot print using this, but by sending it to players as a chat message,
 --you can print things to console that way
 
-
-
 Hook.Add("serverLog", "checkForTrolling", function (text, serverLogMessageType)
 
 	--1 is is the message type for item interaction, which includes the reactor and drone
@@ -22,7 +20,6 @@ Hook.Add("serverLog", "checkForTrolling", function (text, serverLogMessageType)
 				local pattern3 = "Turbine output: ([0-1]?%d),"
 				if (string.find(text, pattern) or string.find(text, pattern2)) and string.find(text, pattern3) then
 					local chatMessage = ChatMessage.Create("Griefing Detection", text, ChatMessageType.Default, nil, nil)
-					chatMessage.Color = Color(255, 255, 0, 255)
 					Game.SendDirectChatMessage(chatMessage, client)
 				end
 				
@@ -30,7 +27,6 @@ Hook.Add("serverLog", "checkForTrolling", function (text, serverLogMessageType)
 				local undockPattern = "undocked"
 				if string.find(text, undockPattern) then
 					local chatMessage = ChatMessage.Create("Griefing Detection", text, ChatMessageType.Default, nil, nil)
-					chatMessage.Color = Color(255, 255, 0, 255)
 					Game.SendDirectChatMessage(chatMessage, client)
 				end
 				
@@ -43,7 +39,7 @@ Hook.Add("serverLog", "checkForTrolling", function (text, serverLogMessageType)
 		for key, client in pairs(Client.ClientList) do
 			if client.HasPermission(ClientPermissions.Ban)then
 				local chatMessage = ChatMessage.Create("Griefing Detection", text, ChatMessageType.Default, nil, nil)
-				chatMessage.Color = Color(255, 255, 0, 255)
+				--chatMessage.Color = Color(255, 255, 0, 255)
 				Game.SendDirectChatMessage(chatMessage, client)
 			end
 		end

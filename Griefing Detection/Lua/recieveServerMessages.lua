@@ -11,8 +11,8 @@ local function retrieveName(inputString)
     local strippedString = inputString:gsub("[^%w%s]", "")
 	local leftSide = string.match(strippedString, "(.-)" .. "end " .. "(.+)")
 	local nextStep = string.match(leftSide, "%d(.+)")
-	local finalized = nextStep:gsub("%d", "")
-    return finalized
+	local name = nextStep:gsub("%d", "")
+    return name
 end
 
 local configPath = path .. "/config.json"
@@ -31,13 +31,13 @@ end
 Hook.Add("chatMessage", "serverChatRecieve", function (message, client)
 	if client ~= nil then return end --do nothing if its not from the server
 	
-	local foundIt = false
+	local containsKeyWord = false
 	for _, filter in ipairs(messageFilters) do
 		if string.find(message, filter) then 
-			foundIt = true
+			containsKeyWord = true
 		end
 	end
-	if foundIt == false then return true end
+	if containsKeyWord == false then return true end
 	
 	
 	config = json.parse(File.Read(configPath)) -- I have no idea why this is needed. Somehow its not recognizing changes to the global config without it. Reference error somehow?

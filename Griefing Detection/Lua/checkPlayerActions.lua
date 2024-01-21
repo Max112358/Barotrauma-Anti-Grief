@@ -3,6 +3,7 @@ if SERVER then return end --prevents it from running on the server
 --the purpose of this script is to check the actions of all players and sound an alarm if they seem suspicious
 
 local susPoints = {} --every time someone does something suspicious, add points. Ring alarm beyond threshold.
+local clientID = ""
 
 -- Use the constructed path. path is a global stored in init
 local sound = Game.SoundManager.LoadSound(path .. "/alert.ogg")
@@ -16,7 +17,7 @@ local function increaseSusPoints(playerName, amountToIncrease)
         -- Player is already in the table, increment their score
         susPoints[playerName] = susPoints[playerName] + amountToIncrease
     else
-        -- Player is not in the table, add them with a score of 1
+        -- Player is not in the table, add them with a score of whatever
         susPoints[playerName] = amountToIncrease
     end
 end
@@ -57,14 +58,14 @@ local function getClientID(passedCharacter)
 end
 
 
---equipped an item
-Hook.Add("item.equip", "equippedAnItem", function(item, paramCharacter)
-   
-	if paramCharacter == nil then return end
-
-	config = json.parse(File.Read(configPath)) -- I have no idea why this is needed. Somehow its not recognizing changes to the global config without it. Reference error somehow?
+-- standard operation of a hook
+local function hookBoilerPlate(item, paramCharacter)
 
 	local isSuspicious = false
+	
+	if paramCharacter == nil then return false end
+
+	config = json.parse(File.Read(configPath)) -- I have no idea why this is needed. Somehow its not recognizing changes to the global config without it. Reference error somehow?
    
 	local isYou = false
 	--if client ~= nil then
@@ -72,11 +73,11 @@ Hook.Add("item.equip", "equippedAnItem", function(item, paramCharacter)
 		isYou = (Character.Controlled.name == paramCharacter.name)
 	end
 	
-	if (isYou and not config.selfAlarmEnabled) then return end --if its your character and self alarm not active, abort
+	if (isYou and not config.selfAlarmEnabled) then return false end --if its your character and self alarm not active, abort
    
 	--check against the sus table to see if the item is bad
 	for itemName, suspicionLevel in pairs(config.susTable) do
-		if itemName == item.Prefab.Identifier and paramCharacter ~= nil then
+		if itemName == item.Prefab.Identifier then
 			increaseSusPoints(paramCharacter.Name, suspicionLevel)
 			if susPoints[paramCharacter.Name] > config.susThreshold then 
 				isSuspicious = true
@@ -84,40 +85,28 @@ Hook.Add("item.equip", "equippedAnItem", function(item, paramCharacter)
 			break -- Exit the loop if a match is found
 		end
 	end
+	
+	clientID = getClientID(usingCharacter)
 
-	local clientID = getClientID(paramCharacter)
+	return isSuspicious
+end
+
+
+
+
+--equipped an item
+Hook.Add("item.equip", "equippedAnItem", function(item, paramCharacter)
+   
+	local isSuspicious = hookBoilerPlate(item, paramCharacter)
+
 	if isSuspicious then activateAlarm(paramCharacter.name .. " has equipped " .. item.name .. "!!!!" .. " Client ID: " .. tostring(clientID)) end
 end)
 
 --applied an item
 Hook.Add("item.applyTreatment", "appliedTreatment", function(item, usingCharacter, targetCharacter, limb)
    
-	if usingCharacter == nil then return end
+	local isSuspicious = hookBoilerPlate(item, usingCharacter)
    
-	config = json.parse(File.Read(configPath)) -- I have no idea why this is needed. Somehow its not recognizing changes to the global config without it. Reference error somehow?
-
-	local isSuspicious = false
-	
-	local isYou = false
-	if Character.Controlled ~= nil then
-		isYou = (Character.Controlled.name == usingCharacter.name)
-	end
-	if (isYou and not config.selfAlarmEnabled) then return end --if its your character and self alarm not active, abort
-   
-
-
-	--logging items that are suspicious to use in large amounts. No immediate alarm on this, just keep an eye on it.
-	for itemName, suspicionLevel in pairs(config.susTable) do
-		if itemName == item.Prefab.Identifier and usingCharacter ~= nil then
-			increaseSusPoints(usingCharacter.Name, suspicionLevel)
-			if susPoints[usingCharacter.Name] > config.susThreshold then 
-				isSuspicious = true
-			end
-			break -- Exit the loop if a match is found
-		end
-	end
-   
-	local clientID = getClientID(usingCharacter)
 	if isSuspicious then activateAlarm(usingCharacter.name .. " has applied " .. item.Name .. " to " .. targetCharacter.name .. "!!!!" .. " Client ID: " .. tostring(clientID)) end
 
    
@@ -126,30 +115,8 @@ end)
 --used an item
 Hook.Add("item.use", "usedItem", function(item, itemUser, targetLimb)
    
-	if itemUser == nil then return end
-   
-   	config = json.parse(File.Read(configPath)) -- I have no idea why this is needed. Somehow its not recognizing changes to the global config without it. Reference error somehow?
-
-	local isSuspicious = false
-
-	local isYou = false
-	if Character.Controlled ~= nil then
-		isYou = (Character.Controlled.name == itemUser.name)
-	end
-	if (isYou and not config.selfAlarmEnabled) then return end --if its your character and self alarm not active, abort
-
-	--logging items that are suspicious to use in large amounts. No immediate alarm on this, just keep an eye on it.
-	for itemName, suspicionLevel in pairs(config.susTable) do
-		if itemName == item.Prefab.Identifier and itemUser ~= nil then
-			increaseSusPoints(itemUser.Name, suspicionLevel)
-			if susPoints[itemUser.Name] > config.susThreshold then 
-				isSuspicious = true
-			end
-			break -- Exit the loop if a match is found
-		end
-	end
-   
-	local clientID = getClientID(itemUser)
+	local isSuspicious = hookBoilerPlate(item, itemUser)
+	
 	if isSuspicious then activateAlarm(itemUser.name .. " has used " .. item.Name .. "!!!!"  .. " Client ID: " .. tostring(clientID)) end
    
 end)
@@ -172,29 +139,14 @@ Hook.Add("inventoryPutItem", "transferredAnItem", function(inventory, item, char
    
 	--if they put welding fuel in a suit or mask
 	for _, itemName in ipairs(config.breathingDevices) do
-	  if item.Name == "Welding Fuel Tank" and inventory.owner.name == itemName then
-		 isSuspicious = true
-		 break
-	  end
-	end
-	
-	--if they put incendium fuel in a suit or mask
-	for _, itemName in ipairs(config.breathingDevices) do
-	  if item.Name == "Incendium Fuel Tank" and inventory.owner.name == itemName then
+	  if (item.Name == "Welding Fuel Tank" or item.Name == "Incendium Fuel Tank") and inventory.owner.name == itemName then
 		 isSuspicious = true
 		 break
 	  end
 	end
    
 	--if they made a welder bomb
-	if item.Name == "Oxygen Tank" and inventory.owner.name == "Welding Tool" then
-		isSuspicious = true
-	end
-	
-	--more ways to welder bomb
-	if item.Name == "Oxygenite Tank" and inventory.owner.name == "Welding Tool" then
-		isSuspicious = true
-	end
+	isSuspicious = (item.Name == "Oxygenite Tank" or item.Name == "Oxygen Tank") and inventory.owner.name == "Welding Tool")
 	
 	--logging items that are suspicious to use in large amounts. No immediate alarm on this, just keep an eye on it.
 	for itemName, suspicionLevel in pairs(config.susTable) do
