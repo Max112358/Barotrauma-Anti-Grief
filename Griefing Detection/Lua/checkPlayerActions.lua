@@ -86,11 +86,10 @@ local function hookBoilerPlate(item, paramCharacter)
 		end
 	end
 	
-	clientID = getClientID(usingCharacter)
+	clientID = getClientID(paramCharacter)
 
 	return isSuspicious
 end
-
 
 
 
@@ -146,7 +145,7 @@ Hook.Add("inventoryPutItem", "transferredAnItem", function(inventory, item, char
 	end
    
 	--if they made a welder bomb
-	isSuspicious = (item.Name == "Oxygenite Tank" or item.Name == "Oxygen Tank") and inventory.owner.name == "Welding Tool")
+	isSuspicious = ((item.Name == "Oxygenite Tank" or item.Name == "Oxygen Tank") and inventory.owner.name == "Welding Tool")
 	
 	--logging items that are suspicious to use in large amounts. No immediate alarm on this, just keep an eye on it.
 	for itemName, suspicionLevel in pairs(griefingDetectionConfig.susTable) do
