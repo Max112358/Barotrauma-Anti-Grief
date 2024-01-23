@@ -5,8 +5,6 @@ if SERVER then return end --prevents it from running on the server
 --prints done in the server log hook do not work reliably because each server log generates its own event, which forms an infinite loop
 --so this is a way of getting around that print restriction
 
-
-
 local function retrieveName(inputString)
     local strippedString = inputString:gsub("[^%w%s]", "")
 	local leftSide = string.match(strippedString, "(.-)" .. "end " .. "(.+)")
@@ -15,24 +13,13 @@ local function retrieveName(inputString)
     return name
 end
 
-local configPath = griefingDetectionPath .. "/config.json"
-
--- Use the constructed path. path is a global stored in init
-local sound = Game.SoundManager.LoadSound(griefingDetectionPath .. "/alert.ogg")
--- Function to activate the alarm
-local function activateAlarm(printStatement)
-	print(printStatement)
-	local myPos = Character.Controlled --center on the controlled character
-	sound.Play(10, 100000, myPos)
-end
-
 
 --this works with the server side script to detect wiring changes. this will not work if the mod isnt running on the server.
 Hook.Add("chatMessage", "serverChatRecieve", function (message, client)
 	if client ~= nil then return end --do nothing if its not from the server
 	
 	local containsKeyWord = false
-	for _, filter in ipairs(griefingDetectionMessageFilters) do
+	for _, filter in ipairs(AntiGrief.messageFilters) do
 		if string.find(message, filter) then 
 			containsKeyWord = true
 		end
@@ -40,32 +27,28 @@ Hook.Add("chatMessage", "serverChatRecieve", function (message, client)
 	if containsKeyWord == false then return true end
 	
 	
-	config = json.parse(File.Read(configPath)) -- I have no idea why this is needed. Somehow its not recognizing changes to the global config without it. Reference error somehow?
+	AntiGrief.config = json.parse(File.Read(AntiGrief.configPath)) -- I have no idea why this is needed. Somehow its not recognizing changes to the global config without it. Reference error somehow?
+	
 	
 	local strippedName = retrieveName(message);
-	
-	
-	
-	
 	local isYou = false
 	if Character.Controlled ~= nil then
 		isYou = (Character.Controlled.name == strippedName)
 	end
 	
 	
-	if (isYou and not config.selfAlarmEnabled) then return true end --if its your character and self alarm not active, abort
-
+	if (isYou and not AntiGrief.config.selfAlarmEnabled) then return true end --if its your character and self alarm not active, abort
 	
-	if (string.find(message, "wire")) and config.wiringAlarmEnabled then
-		activateAlarm(message)
+	if (string.find(message, "wire")) and AntiGrief.config.wiringAlarmEnabled then
+		AntiGrief.activateAlarm(message)
 	end
 	
-	if (string.find(message, "undocked")) and config.undockAlarmEnabled then
-		activateAlarm(message)
+	if (string.find(message, "undocked")) and AntiGrief.config.undockAlarmEnabled then
+		AntiGrief.activateAlarm(message)
 	end
 	
-	if (string.find(message, "Fission")) and config.reactorAlarmEnabled then
-		activateAlarm(message)
+	if (string.find(message, "Fission")) and AntiGrief.config.reactorAlarmEnabled then
+		AntiGrief.activateAlarm(message)
 	end
 	
 	
