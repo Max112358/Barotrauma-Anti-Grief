@@ -35,19 +35,13 @@ Hook.Patch("Barotrauma.Inventory", "DrawSlot", function(instance, ptable) --unsu
 	
 	for _, item in pairs(listOfDetonators) do
 		if item ~= nil then
-			pos = Screen.Selected.Cam.WorldToScreen(item.WorldPosition);
-
-			pos.X = pos.X - 64
-			pos.Y = pos.Y - 64
-
-			--local angleRad = math.rad(rotation)  -- Convert degrees to radians
-			--local radius = 0
-			--local x =  math.cos(angleRad)
-			--local y =  math.sin(angleRad)
-			--pos.X = pos.X + math.cos(angleRad) * radius
-			--pos.Y = pos.Y + math.sin(angleRad) * radius
-				
-			crosshairIcon.Draw(spriteBatch, pos, color, rotation, scale)
+		
+			if item.ParentInventory == nil then
+				pos = Screen.Selected.Cam.WorldToScreen(item.WorldPosition);
+				pos.X = pos.X - 64
+				pos.Y = pos.Y - 64
+				crosshairIcon.Draw(spriteBatch, pos, color, rotation, scale)
+			end
 		end
 	end
 	
