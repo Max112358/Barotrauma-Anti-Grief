@@ -114,6 +114,14 @@ Hook.Add("item.use", "usedItem", function(item, itemUser, targetLimb)
    
 end)
 
+
+
+
+
+
+
+
+
 --moved item to inventory 
 Hook.Add("inventoryPutItem", "transferredAnItem", function(inventory, item, characterUser)
    
@@ -132,6 +140,7 @@ Hook.Add("inventoryPutItem", "transferredAnItem", function(inventory, item, char
 	if (isYou and not AntiGrief.config.selfAlarmEnabled) then return end --if its your character and self alarm not active, abort
    
 	
+	
 	if LuaUserData.IsTargetType(inventory.owner.GetType(), "Barotrauma.Item") then
 		--check for welder bombs
 		if item.HasTag("oxygensource") and inventory.owner.HasTag("weldingequipment") then
@@ -145,6 +154,11 @@ Hook.Add("inventoryPutItem", "transferredAnItem", function(inventory, item, char
 		
 		--check for suit/mask poisoning
 		if item.HasTag("weldingfuel") and (inventory.owner.HasTag("diving") or  inventory.owner.HasTag("deepdiving")) then
+			isSuspicious = true
+		end
+		
+		--check for loading a detonator
+		if item.HasTag("explosive") and inventory.owner.HasTag("detonator") then
 			isSuspicious = true
 		end
 	end
