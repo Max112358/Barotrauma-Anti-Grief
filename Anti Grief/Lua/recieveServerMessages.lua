@@ -24,7 +24,7 @@ Hook.Add("chatMessage", "serverChatRecieve", function (message, client)
 			containsKeyWord = true
 		end
 	end
-	if containsKeyWord == false then return true end
+	if containsKeyWord == false then return end
 	
 	
 	AntiGrief.config = json.parse(File.Read(AntiGrief.configPath)) -- I have no idea why this is needed. Somehow its not recognizing changes to the global config without it. Reference error somehow?
@@ -35,9 +35,9 @@ Hook.Add("chatMessage", "serverChatRecieve", function (message, client)
 	if Character.Controlled ~= nil then
 		isYou = (Character.Controlled.name == strippedName)
 	end
-	
-	
 	if (isYou and not AntiGrief.config.selfAlarmEnabled) then return true end --if its your character and self alarm not active, abort
+	
+	
 	
 	if (string.find(message, "wire")) and AntiGrief.config.wiringAlarmEnabled then
 		AntiGrief.activateAlarm(message)
