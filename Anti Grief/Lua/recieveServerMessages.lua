@@ -18,13 +18,7 @@ end
 Hook.Add("chatMessage", "serverChatRecieve", function (message, client)
 	if client ~= nil then return end --do nothing if its not from the server
 	
-	local containsKeyWord = false
-	for _, filter in ipairs(AntiGrief.messageFilters) do
-		if string.find(message, filter) then 
-			containsKeyWord = true
-		end
-	end
-	if containsKeyWord == false then return end
+	if not (string.find(message, AntiGrief.messageFilter)) then return end --do nothing if not from the mod
 	
 	
 	AntiGrief.config = json.parse(File.Read(AntiGrief.configPath)) -- I have no idea why this is needed. Somehow its not recognizing changes to the global config without it. Reference error somehow?
