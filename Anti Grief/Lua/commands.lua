@@ -6,12 +6,14 @@ if SERVER then return end --prevents it from running on the server
 
 local configDescriptions = {}
 configDescriptions["commands"] = "you can use antigrief or ag"
-configDescriptions["reset"] = "reset settings to default values EX: ag reset"
+configDescriptions["reset"] = "Reset settings to default values EX: ag reset"
+configDescriptions["volume"] = "Change alarm volume between 0 (silent) and 1 (max volume). EX: ag volume 0.5"
+configDescriptions["list"] = "List out all suspicious items and their suspicion values. EX: ag list"
 configDescriptions["threshold"] = "How many sus points a player must get before alarms go off. Default is 20. EX: ag threshold 30"
 configDescriptions["decaytime"] = "How fast players lose sus points in milliseconds. Default is 5000. Players cannot go below 0. EX: ag decaytime 4000"
 configDescriptions["add"] = "Add (or update) an item on the list of suspicious items. Num is suspicion level EX: ag add screwdriver 5"
 configDescriptions["remove"] = "Remove an item to the list of suspicious items. EX: ag remove screwdriver"
-configDescriptions["toggle"] = "Toggles various alarms on/off. Choices are: self, reactor, undock, wiring EX: ag toggle self"
+configDescriptions["toggle"] = "Toggles various alarms on/off. Choices are: self, reactor, undock, wiring, detonators, admin. EX: ag toggle self"
 configDescriptions["ban"] = "Adds player to personal banlist. Use this if you are not the host. EX ag ban playername reason(optional)"
 
 
@@ -24,18 +26,19 @@ local function isInteger(str)
     return str and not (str == "" or str:find("%D"))
 end
 
-local function addMissingEntriesWithExclusionRecursive(table1, table2, excludedKey)
-    for key, value in pairs(table1) do
-        if key ~= excludedKey then
-            if type(value) == "table" and type(table2[key]) == "table" then
-                -- If both values are tables, recursively merge them
-                addMissingEntriesWithExclusionRecursive(value, table2[key], excludedKey)
-            else
-                -- Otherwise, set the value directly
-                table2[key] = value
-            end
+local function isFloat(str)
+    local n = tonumber(str)
+    return n ~= nil and math.floor(n) ~= n
+end
+
+function removeKeyFromTable(tbl, keyToRemove)
+    local newTable = {}
+    for k, v in pairs(tbl) do
+        if k ~= keyToRemove then
+            newTable[k] = v
         end
     end
+    return newTable
 end
 
 local function checkStringAgainstTags(targetString, tags)
@@ -82,6 +85,24 @@ local function runCommand(command)
 		end
 	end
 	
+	if command[1] == "volume" then
+		if isFloat(command[2]) or tonumber(command[2]) then
+			local volume = tonumber(command[2])
+			print("Changing alarm volume!")
+			AntiGrief.config.alarmVolume = volume
+			writeConfig(AntiGrief.config)
+		else
+			print("Valid number not supplied, changing nothing.")
+		end
+	end
+	
+	if command[1] == "list" then
+		for key, value in pairs(AntiGrief.config.susTable) do
+			print(key, "=", value)
+		end
+	end
+	
+	
 	if command[1] == "add" then
 		if isInteger(command[3]) then
 			local prefab = ItemPrefab.GetItemPrefab(command[2])
@@ -101,10 +122,9 @@ local function runCommand(command)
 	
 		if AntiGrief.config.susTable[command[2]] ~= nil then
 			print("Removing item!")
-			local newTable = dofile(AntiGrief.path .. "/Lua/defaultConfig.lua")
-			addMissingEntriesWithExclusionRecursive(AntiGrief.config, newTable, command[2])
-			writeConfig(newTable)
-			AntiGrief.config = newTable
+			local newTable = removeKeyFromTable(AntiGrief.config.susTable, command[2])
+            AntiGrief.config.susTable = newTable
+			writeConfig(AntiGrief.config)
 		else
 			print("Item not found in the table.")
 		end
@@ -134,6 +154,18 @@ local function runCommand(command)
 			AntiGrief.config.wiringAlarmEnabled = not AntiGrief.config.wiringAlarmEnabled
 			writeConfig(AntiGrief.config)
 			print("Wiring Alarm Active: " .. tostring(AntiGrief.config.wiringAlarmEnabled))
+		end
+		
+		if command[2] == "detonators" or command[2] == "detonator" then
+			AntiGrief.config.markDetonatorsEnabled = not AntiGrief.config.markDetonatorsEnabled
+			writeConfig(AntiGrief.config)
+			print("Detonator Detection Active: " .. tostring(AntiGrief.config.markDetonatorsEnabled))
+		end
+		
+		if command[2] == "admin" then
+			AntiGrief.config.adminAlarmEnabled = not AntiGrief.config.adminAlarmEnabled
+			writeConfig(AntiGrief.config)
+			print("Admin Alarm Active: " .. tostring(AntiGrief.config.adminAlarmEnabled))
 		end
 		
 	end

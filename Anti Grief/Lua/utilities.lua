@@ -10,7 +10,7 @@ function AntiGrief.activateAlarm(printStatement)
 	local center = Vector2(centerX, centerY)
 	local viewPosition = Screen.Selected.Cam.ScreenToWorld(center)
 	
-	local gain = 10
+	local gain = AntiGrief.config.alarmVolume
 	local range = 10000000
 	AntiGrief.sound.Play(gain, range, viewPosition)
 end
@@ -41,3 +41,18 @@ function AntiGrief.getClientIDFromName(passedName)
 	end
 	return clientID
 end
+
+
+-- Checks if a character has banpermission or not
+function AntiGrief.isCharacterAnAdmin(passedCharacter)
+	for key, client in pairs(Client.ClientList) do
+		if client.HasPermission(ClientPermissions.Ban)then
+			if client.Character.Controlled == passedCharacter then
+				return true
+			end
+		end
+	end
+	return false
+end
+
+

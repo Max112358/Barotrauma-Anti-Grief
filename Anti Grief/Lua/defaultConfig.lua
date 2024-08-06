@@ -6,11 +6,14 @@ local config = {}
 
 config.susThreshold = 20 --tolerance for how suspicious someone can act before alarms go off
 config.decayTime = 5000 --time until everyone loses a susPoint, in milliseconds
+config.alarmVolume = 0.5 --how loud the alarm plays
 
 config.wiringAlarmEnabled = true --controls the wiring alarm
 config.undockAlarmEnabled = true --controls the dock alarm
 config.reactorAlarmEnabled = true --controls the reactor alarm
 config.selfAlarmEnabled = false --alarms will sound for your own actions
+config.markDetonatorsEnabled = true --draw a target around detonators
+config.adminAlarmEnabled = false --alarms will sound for the actions of anyone with ban permission
 
 config.susTable = {}
 config.susTable = { --how suspicious using a given item is

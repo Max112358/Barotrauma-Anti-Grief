@@ -31,6 +31,8 @@ Hook.Add("chatMessage", "serverChatRecieve", function (message, client)
 	end
 	if (isYou and not AntiGrief.config.selfAlarmEnabled) then return true end --if its your character and self alarm not active, abort
 	
+	local isAdmin = AntiGrief.isCharacterAnAdmin(characterUser)
+	if isAdmin and not AntiGrief.config.adminAlarmEnabled then return true end --if its an admin character and admin alarm not active, abort
 	
 	
 	if (string.find(message, "wire")) and AntiGrief.config.wiringAlarmEnabled then

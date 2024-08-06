@@ -51,8 +51,11 @@ local function hookBoilerPlate(item, paramCharacter)
 	if Character.Controlled ~= nil then
 		isYou = (Character.Controlled.name == paramCharacter.name)
 	end
-	
+
 	if (isYou and not AntiGrief.config.selfAlarmEnabled) then return false end --if its your character and self alarm not active, abort
+	
+	local isAdmin = AntiGrief.isCharacterAnAdmin(characterUser)
+	if isAdmin and not AntiGrief.config.adminAlarmEnabled then return end
    
 	--check against the sus table to see if the item is bad
 	for itemName, suspicionLevel in pairs(AntiGrief.config.susTable) do
@@ -89,7 +92,7 @@ end)
 
 --equipped an item
 Hook.Add("item.equip", "equippedAnItem", function(item, paramCharacter)
-   
+	
 	local isSuspicious = hookBoilerPlate(item, paramCharacter)
 
 	if isSuspicious then AntiGrief.activateAlarm(paramCharacter.name .. " has equipped " .. item.name .. "!!!!" .. " Client ID: " .. tostring(clientID)) end
@@ -101,8 +104,6 @@ Hook.Add("item.applyTreatment", "appliedTreatment", function(item, usingCharacte
 	local isSuspicious = hookBoilerPlate(item, usingCharacter)
    
 	if isSuspicious then AntiGrief.activateAlarm(usingCharacter.name .. " has applied " .. item.Name .. " to " .. targetCharacter.name .. "!!!!" .. " Client ID: " .. tostring(clientID)) end
-
-   
 end)
 
 --used an item
@@ -111,7 +112,6 @@ Hook.Add("item.use", "usedItem", function(item, itemUser, targetLimb)
 	local isSuspicious = hookBoilerPlate(item, itemUser)
 	
 	if isSuspicious then AntiGrief.activateAlarm(itemUser.name .. " has used " .. item.Name .. "!!!!"  .. " Client ID: " .. tostring(clientID)) end
-   
 end)
 
 
@@ -125,9 +125,8 @@ end)
 --moved item to inventory 
 Hook.Add("inventoryPutItem", "transferredAnItem", function(inventory, item, characterUser)
    
-   
 	if characterUser == nil then return end
-   
+
 	AntiGrief.config = json.parse(File.Read(AntiGrief.configPath)) -- I have no idea why this is needed. Somehow its not recognizing changes to the global config without it. Reference error somehow?
 
 	-- Check if item.Name matches any entry in AntiGrief.config.susTable
@@ -139,6 +138,9 @@ Hook.Add("inventoryPutItem", "transferredAnItem", function(inventory, item, char
 	end
 	if (isYou and not AntiGrief.config.selfAlarmEnabled) then return end --if its your character and self alarm not active, abort
    
+	local isAdmin = AntiGrief.isCharacterAnAdmin(characterUser)
+	if isAdmin and not AntiGrief.config.adminAlarmEnabled then return end --if its an admin character and admin alarm not active, abort
+	
 	
 	
 	if LuaUserData.IsTargetType(inventory.owner.GetType(), "Barotrauma.Item") then

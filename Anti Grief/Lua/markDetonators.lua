@@ -32,6 +32,7 @@ Hook.Patch("Barotrauma.Inventory", "DrawSlot", function(instance, ptable) --unsu
 	local spriteBatch = ptable["spriteBatch"]
 	
 	if listOfDetonators == nil then return end
+	if AntiGrief.config.markDetonatorsEnabled == false then return end
 	
 	for _, item in pairs(listOfDetonators) do
 		if item ~= nil then
