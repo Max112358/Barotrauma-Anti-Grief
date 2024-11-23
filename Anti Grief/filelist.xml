@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<contentpackage name="Anti Grief" modversion="1.0.10" corepackage="False" steamworkshopid="3141485408" gameversion="1.5.9.1">
+<contentpackage name="Anti Grief" modversion="1.0.21" corepackage="False" steamworkshopid="3141485408" gameversion="1.6.19.1">
   <Other file="%ModDir%/alert.ogg" />
   <Other file="%ModDir%/readme.txt" />
 </contentpackage>

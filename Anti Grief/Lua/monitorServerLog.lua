@@ -7,7 +7,7 @@ if CLIENT then return end -- stops this from running on the client
 --normally you cannot print using this, but by sending it to players as a chat message,
 --you can print things to console that way
 
-Hook.Add("serverLog", "checkForTrolling", function (text, serverLogMessageType)
+Hook.Add("serverLog", "AntiGriefcheckForTrolling", function (text, serverLogMessageType)
 
 	--local chatMessage = ChatMessage.Create("Anti Grief", text, ChatMessageType.Default, nil, nil)
 	--Game.SendDirectChatMessage(chatMessage, client)
@@ -18,6 +18,8 @@ Hook.Add("serverLog", "checkForTrolling", function (text, serverLogMessageType)
 	if serverLogMessageType == 1 then
 		for key, client in pairs(Client.ClientList) do
 			if client.HasPermission(ClientPermissions.Ban)then
+			
+				--[[ --this is now handled clientside, and it works
 				--detect putting the reactor into a dangerous state
 				local pattern = "Fission rate: ([8-9]%d)"
 				local pattern2 = "Fission rate: 100"
@@ -26,6 +28,7 @@ Hook.Add("serverLog", "checkForTrolling", function (text, serverLogMessageType)
 					local chatMessage = ChatMessage.Create("Anti Grief", chatString, ChatMessageType.Default, nil, nil)
 					Game.SendDirectChatMessage(chatMessage, client)
 				end
+				--]]
 				
 				--detect undocking the drone or ship
 				local undockPattern = "undocked"

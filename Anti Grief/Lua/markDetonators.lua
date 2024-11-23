@@ -9,15 +9,16 @@ local listOfDetonators = {}
 
 
 local function findAllDetonators()
-	Timer.Wait(findAllDetonators, 1000) --recursively run again every X seconds, where X is in miliseconds
+	Timer.Wait(findAllDetonators, 1000) --recursively run again every milliseconds
 
 	if Submarine == nil then return end
 	if Submarine.MainSub == nil then return end
 	local allItems = Submarine.MainSub.GetItems(false)
 
-	listOfDetonators = {}
+	listOfDetonators = {} --blank the list so it doesnt add duplicates. also removes old ones.
 	for _, item in pairs(allItems) do
-		if item.Prefab.Identifier == "detonator" then
+		--if item.Prefab.Identifier == "detonator" then
+		if item.HasTag("detonator") then
 			table.insert(listOfDetonators, item)
 		end
 	end

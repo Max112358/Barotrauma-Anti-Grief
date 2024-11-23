@@ -9,6 +9,7 @@ configDescriptions["commands"] = "you can use antigrief or ag"
 configDescriptions["reset"] = "Reset settings to default values EX: ag reset"
 configDescriptions["volume"] = "Change alarm volume between 0 (silent) and 1 (max volume). EX: ag volume 0.5"
 configDescriptions["list"] = "List out all suspicious items and their suspicion values. EX: ag list"
+configDescriptions["clients"] = "List out all clients and all info about them. EX: ag clients"
 configDescriptions["threshold"] = "How many sus points a player must get before alarms go off. Default is 20. EX: ag threshold 30"
 configDescriptions["decaytime"] = "How fast players lose sus points in milliseconds. Default is 5000. Players cannot go below 0. EX: ag decaytime 4000"
 configDescriptions["add"] = "Add (or update) an item on the list of suspicious items. Num is suspicion level EX: ag add screwdriver 5"
@@ -19,6 +20,7 @@ configDescriptions["ban"] = "Adds player to personal banlist. Use this if you ar
 
 local function writeConfig(newConfig)
 	File.Write(AntiGrief.path .. "/config.json", json.serialize(newConfig))
+	AntiGrief.config = json.parse(File.Read(AntiGrief.configPath))
 end
 
 
@@ -102,6 +104,10 @@ local function runCommand(command)
 		end
 	end
 	
+	if command[1] == "clients" then
+		AntiGrief.printAllClients()
+	end
+	
 	
 	if command[1] == "add" then
 		if isInteger(command[3]) then
@@ -136,6 +142,7 @@ local function runCommand(command)
 			AntiGrief.config.selfAlarmEnabled = not AntiGrief.config.selfAlarmEnabled
 			writeConfig(AntiGrief.config)
 			print("Self Alarm Active: " .. tostring(AntiGrief.config.selfAlarmEnabled))
+			print("Reminder: if you have ban permission, you also have to enable admin alarm to see your own alerts.")
 		end
 		
 		if command[2] == "reactor" then

@@ -5,7 +5,7 @@ if SERVER then return end --prevents it from running on the server
 
 local badGuyList = File.Read("Data/bannedplayers.xml")
 
-Hook.Add("character.created", "checkNewGuyVsBanListOnCreation", function (createdCharacter)
+Hook.Add("character.created", "AntiGriefcheckNewGuyVsBanListOnCreation", function (createdCharacter)
 	
 	local clientID = AntiGrief.getClientID(createdCharacter)
 	

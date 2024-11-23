@@ -15,25 +15,13 @@ end
 
 
 --this works with the server side script to detect wiring changes. this will not work if the mod isnt running on the server.
-Hook.Add("chatMessage", "serverChatRecieve", function (message, client)
+Hook.Add("chatMessage", "AntiGriefserverChatRecieve", function (message, client)
 	if client ~= nil then return end --do nothing if its not from the server
 	
 	if not (string.find(message, AntiGrief.messageFilter)) then return end --do nothing if not from the mod
 	
-	
-	AntiGrief.config = json.parse(File.Read(AntiGrief.configPath)) -- I have no idea why this is needed. Somehow its not recognizing changes to the global config without it. Reference error somehow?
-	
-	
 	local strippedName = retrieveName(message);
-	local isYou = false
-	if Character.Controlled ~= nil then
-		isYou = (Character.Controlled.name == strippedName)
-	end
-	if (isYou and not AntiGrief.config.selfAlarmEnabled) then return true end --if its your character and self alarm not active, abort
-	
-	local isAdmin = AntiGrief.isCharacterAnAdmin(characterUser)
-	if isAdmin and not AntiGrief.config.adminAlarmEnabled then return true end --if its an admin character and admin alarm not active, abort
-	
+	if AntiGrief.shouldIgnoreThisPersonForAlarms(strippedName) then return true end
 	
 	if (string.find(message, "wire")) and AntiGrief.config.wiringAlarmEnabled then
 		AntiGrief.activateAlarm(message)

@@ -44,17 +44,9 @@ local function hookBoilerPlate(item, paramCharacter)
 	clientID = AntiGrief.getClientID(paramCharacter)
 	if clientID == "" then return end
 
-	AntiGrief.config = json.parse(File.Read(AntiGrief.configPath)) -- I have no idea why this is needed. Somehow its not recognizing changes to the global AntiGrief.config without it. Reference error somehow?
-   
-	local isYou = false
-	--if client ~= nil then
-	if Character.Controlled ~= nil then
-		isYou = (Character.Controlled.name == paramCharacter.name)
-	end
-
-	if (isYou and not AntiGrief.config.selfAlarmEnabled) then return false end --if its your character and self alarm not active, abort
+	if AntiGrief.shouldIgnoreThisPersonForAlarms(paramCharacter.name) then return end
 	
-	local isAdmin = AntiGrief.isCharacterAnAdmin(characterUser)
+	local isAdmin = AntiGrief.isCharacterStringAnAdmin(paramCharacter.name)
 	if isAdmin and not AntiGrief.config.adminAlarmEnabled then return end
    
 	--check against the sus table to see if the item is bad
@@ -91,7 +83,7 @@ end)
 
 
 --equipped an item
-Hook.Add("item.equip", "equippedAnItem", function(item, paramCharacter)
+Hook.Add("item.equip", "AntiGriefEquippedAnItem", function(item, paramCharacter)
 	
 	local isSuspicious = hookBoilerPlate(item, paramCharacter)
 
@@ -99,7 +91,7 @@ Hook.Add("item.equip", "equippedAnItem", function(item, paramCharacter)
 end)
 
 --applied an item
-Hook.Add("item.applyTreatment", "appliedTreatment", function(item, usingCharacter, targetCharacter, limb)
+Hook.Add("item.applyTreatment", "AntiGriefAppliedTreatment", function(item, usingCharacter, targetCharacter, limb)
    
 	local isSuspicious = hookBoilerPlate(item, usingCharacter)
    
@@ -107,7 +99,7 @@ Hook.Add("item.applyTreatment", "appliedTreatment", function(item, usingCharacte
 end)
 
 --used an item
-Hook.Add("item.use", "usedItem", function(item, itemUser, targetLimb)
+Hook.Add("item.use", "AntiGriefUsedItem", function(item, itemUser, targetLimb)
    
 	local isSuspicious = hookBoilerPlate(item, itemUser)
 	
@@ -123,25 +115,14 @@ end)
 
 
 --moved item to inventory 
-Hook.Add("inventoryPutItem", "transferredAnItem", function(inventory, item, characterUser)
+Hook.Add("inventoryPutItem", "AntiGriefTransferredAnItem", function(inventory, item, characterUser)
    
 	if characterUser == nil then return end
-
-	AntiGrief.config = json.parse(File.Read(AntiGrief.configPath)) -- I have no idea why this is needed. Somehow its not recognizing changes to the global config without it. Reference error somehow?
 
 	-- Check if item.Name matches any entry in AntiGrief.config.susTable
 	local isSuspicious = false
    
-	local isYou = false
-	if Character.Controlled ~= nil then
-		isYou = (Character.Controlled.name == characterUser.name)
-	end
-	if (isYou and not AntiGrief.config.selfAlarmEnabled) then return end --if its your character and self alarm not active, abort
-   
-	local isAdmin = AntiGrief.isCharacterAnAdmin(characterUser)
-	if isAdmin and not AntiGrief.config.adminAlarmEnabled then return end --if its an admin character and admin alarm not active, abort
-	
-	
+	if AntiGrief.shouldIgnoreThisPersonForAlarms(characterUser.name) then return end
 	
 	if LuaUserData.IsTargetType(inventory.owner.GetType(), "Barotrauma.Item") then
 		--check for welder bombs
@@ -188,3 +169,7 @@ Hook.Add("inventoryPutItem", "transferredAnItem", function(inventory, item, char
 	if clientID == "" then return end
 	if isSuspicious then AntiGrief.activateAlarm(characterUser.Name .. " has transferred " .. item.name .. " to " .. inventory.owner.name .. "!!!!" .. " Client ID: " .. tostring(clientID)) end
 end)
+
+
+
+

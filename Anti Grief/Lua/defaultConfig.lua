@@ -38,6 +38,7 @@ config.susTable = { --how suspicious using a given item is
 	["chloralhydrate"] = 25,
 	["morbusine"] = 25,
 	["detonator"] = 25,
+	["timeddetonator"] = 25,
 	["nitroglycerin"] = 25,
 	["incendiumgrenade"] = 25,
 	["fraggrenade"] = 25,
